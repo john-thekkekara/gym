@@ -45,7 +45,6 @@ class AtariEnv(gym.Env, utils.EzPickle):
         self._seed()
 
         (screen_width, screen_height) = self.ale.getScreenDims()
-        self._buffer = np.empty((screen_height, screen_width, 4), dtype=np.uint8)
 
         self._action_set = self.ale.getMinimalActionSet()
         self.action_space = spaces.Discrete(len(self._action_set))
@@ -81,11 +80,10 @@ class AtariEnv(gym.Env, utils.EzPickle):
             reward += self.ale.act(action)
         ob = self._get_obs()
 
-        return ob, reward, self.ale.game_over(), {}
+        return ob, reward, self.ale.game_over(), {"ale.lives": self.ale.lives()}
 
     def _get_image(self):
-        self.ale.getScreenRGB(self._buffer)  # says rgb but actually bgr
-        return self._buffer[:, :, [2, 1, 0]]
+        return self.ale.getScreenRGB2()
 
     def _get_ram(self):
         return to_ram(self.ale)
@@ -123,6 +121,29 @@ class AtariEnv(gym.Env, utils.EzPickle):
 
     def get_action_meanings(self):
         return [ACTION_MEANING[i] for i in self._action_set]
+
+    def get_keys_to_action(self):
+        KEYWORD_TO_KEY = {
+            'UP':      ord('w'),
+            'DOWN':    ord('s'),
+            'LEFT':    ord('a'),
+            'RIGHT':   ord('d'),
+            'FIRE':    ord(' '),
+        }
+
+        keys_to_action = {}
+
+        for action_id, action_meaning in enumerate(self.get_action_meanings()):
+            keys = []
+            for keyword, key in KEYWORD_TO_KEY.items():
+                if keyword in action_meaning:
+                    keys.append(key)
+            keys = tuple(sorted(keys))
+
+            assert keys not in keys_to_action
+            keys_to_action[keys] = action_id
+
+        return keys_to_action
 
     # def save_state(self):
     #     return self.ale.saveState()

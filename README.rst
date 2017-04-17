@@ -1,15 +1,17 @@
-gym
-******
+OpenAI Gym
+**********
+
+**OpenAI Gym is a toolkit for developing and comparing reinforcement learning algorithms.** This is the ``gym`` open-source library, which gives you access to an ever-growing variety of environments.
 
 .. image:: https://travis-ci.org/openai/gym.svg?branch=master
     :target: https://travis-ci.org/openai/gym
 
-**OpenAI Gym is a toolkit for developing and comparing reinforcement learning algorithms.** This is the ``gym`` open-source library, which gives you access to an ever-growing variety of environments.
+`See What's New section below <#what-s-new>`_
 
 ``gym`` makes no assumptions about the structure of your agent, and is compatible with any numerical computation library, such as TensorFlow or Theano. You can use it from Python code, and soon from other languages.
 
 If you're not sure where to start, we recommend beginning with the
-`docs <https://gym.openai.com/docs>`_ on our site.
+`docs <https://gym.openai.com/docs>`_ on our site. See also the `FAQ <https://github.com/openai/gym/wiki/FAQ>`_.
 
 A whitepaper for OpenAI Gym is available at http://arxiv.org/abs/1606.01540, and here's a BibTeX entry that you can use to cite it in a publication::
 
@@ -32,8 +34,7 @@ algorithm you are writing). The agent sends `actions` to the
 environment, and the environment replies with `observations` and
 `rewards` (that is, a score).
 
-The core `gym` interface is `Env
-<https://github.com/openai/gym/blob/master/gym/core.py>`_, which is
+The core `gym` interface is `Env <https://github.com/openai/gym/blob/master/gym/core.py>`_, which is
 the unified environment interface. There is no interface for agents;
 that part is left to you. The following are the ``Env`` methods you
 should know:
@@ -97,18 +98,14 @@ Once you're ready to install everything, run ``pip install -e '.[all]'`` (or ``p
 Supported systems
 -----------------
 
-We currently support Linux and OS X running Python 2.7 or 3.5.
-Python 3 support should still be considered experimental -- if you find any bugs, please report them!
-
-In particular on OSX + Python3 you may need to run
+We currently support Linux and OS X running Python 2.7 or 3.5. Some users on OSX + Python3 may need to run
 
 .. code:: shell
 
 	  brew install boost-python --with-python3
 
-We will expand support to Windows based on demand. We
-will also soon ship a Docker container exposing the environments
-callable from any platform, for use with any non-Python framework, such as Torch.
+If you want to access Gym from languages other than python, we have limited support for non-python
+frameworks, such as lua/Torch, using the OpenAI Gym `HTTP API <https://github.com/openai/gym-http-api>`_.
 
 Pip version
 -----------
@@ -248,22 +245,32 @@ See the ``examples`` directory.
 - Run `examples/agents/random_agent.py <https://github.com/openai/gym/blob/master/examples/agents/random_agent.py>`_ to run an simple random agent and upload the results to the scoreboard.
 - Run `examples/agents/cem.py <https://github.com/openai/gym/blob/master/examples/agents/cem.py>`_ to run an actual learning agent (using the cross-entropy method) and upload the results to the scoreboard.
 - Run `examples/scripts/list_envs <https://github.com/openai/gym/blob/master/examples/scripts/list_envs>`_ to generate a list of all environments. (You see also just `browse <https://gym.openai.com/docs>`_ the list on our site.
-  - Run `examples/scripts/upload <https://github.com/openai/gym/blob/master/examples/scripts/upload>`_ to upload the recorded output from ``random_agent.py`` or ``cem.py``. Make sure to obtain an `API key <https://gym.openai.com/settings/profile>`_.
+- Run `examples/scripts/upload <https://github.com/openai/gym/blob/master/examples/scripts/upload>`_ to upload the recorded output from ``random_agent.py`` or ``cem.py``. Make sure to obtain an `API key <https://gym.openai.com/settings/profile>`_.
 
 Testing
 =======
 
-We are using `nose2 <https://github.com/nose-devs/nose2>`_ for tests. You can run them via:
+We are using `pytest <http://doc.pytest.org>`_ for tests. You can run them via:
 
 .. code:: shell
 
-	  nose2
+	  pytest
 
-You can also run tests in a specific directory by using the ``-s`` option, or by passing in the specific name of the test. See the `nose2 docs <http://nose2.readthedocs.org/en/latest/usage.html#naming-tests>`_ for more details.
+
+.. _See What's New section below:
 
 What's new
-----------
+==========
 
+- 2017-03-05: BACKWARDS INCOMPATIBILITY: The `configure` method has been removed
+  from `Env`. `configure` was not used by `gym`, but was used by some dependent
+  libraries including `universe`. These libraries will migrate away from the
+  configure method by using wrappers instead. This change is on master and will be released with 0.8.0.
+- 2016-12-27: BACKWARDS INCOMPATIBILITY: The gym monitor is now a
+  wrapper. Rather than starting monitoring as
+  `env.monitor.start(directory)`, envs are now wrapped as follows:
+  `env = wrappers.Monitor(env, directory)`. This change is on master
+  and will be released with 0.7.0.
 - 2016-11-1: Several experimental changes to how a running monitor interacts
   with environments. The monitor will now raise an error if reset() is called
   when the env has not returned done=True. The monitor will only record complete

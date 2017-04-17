@@ -251,10 +251,10 @@ class ImageEncoder(object):
         self.frame_shape = frame_shape
         self.frames_per_sec = frames_per_sec
 
-        if distutils.spawn.find_executable('ffmpeg') is not None:
-            self.backend = 'ffmpeg'
-        elif distutils.spawn.find_executable('avconv') is not None:
+        if distutils.spawn.find_executable('avconv') is not None:
             self.backend = 'avconv'
+        elif distutils.spawn.find_executable('ffmpeg') is not None:
+            self.backend = 'ffmpeg'
         else:
             raise error.DependencyNotInstalled("""Found neither the ffmpeg nor avconv executables. On OS X, you can install ffmpeg via `brew install ffmpeg`. On most Ubuntu variants, `sudo apt-get install ffmpeg` should do it. On Ubuntu 14.04, however, you'll need to install avconv with `sudo apt-get install libav-tools`.""")
 
@@ -289,7 +289,10 @@ class ImageEncoder(object):
                      )
 
         logger.debug('Starting ffmpeg with "%s"', ' '.join(self.cmdline))
-        self.proc = subprocess.Popen(self.cmdline, stdin=subprocess.PIPE)
+        if hasattr(os,'setsid'): #setsid not present on Windows
+            self.proc = subprocess.Popen(self.cmdline, stdin=subprocess.PIPE, preexec_fn=os.setsid)
+        else:
+            self.proc = subprocess.Popen(self.cmdline, stdin=subprocess.PIPE)
 
     def capture_frame(self, frame):
         if not isinstance(frame, (np.ndarray, np.generic)):

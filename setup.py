@@ -7,7 +7,7 @@ from version import VERSION
 
 # Environment-specific dependencies.
 extras = {
-  'atari': ['atari_py>=0.0.17', 'Pillow', 'PyOpenGL'],
+  'atari': ['atari_py>=0.0.21', 'Pillow', 'PyOpenGL'],
   'board_game' : ['pachi-py>=0.0.19'],
   'box2d': ['box2d-py'],
   'classic_control': ['PyOpenGL'],
@@ -36,5 +36,5 @@ setup(name='gym',
       ],
       extras_require=extras,
       package_data={'gym': ['envs/mujoco/assets/*.xml', 'envs/classic_control/assets/*.png']},
-      tests_require=['nose2', 'mock'],
+      tests_require=['pytest', 'mock'],
 )
